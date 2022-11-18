@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Role;
 
-class createRolesSeeder extends Seeder
+class CreateRolesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,11 +20,12 @@ class createRolesSeeder extends Seeder
                 'name' => 'Admin',
             ],
             [
-                'id' => 1,
+                'id' => 2,
                 'name' => 'User',
             ]
             ];
-            foreach ($roles as $kEY => $role){
+
+            foreach ($roles as $key => $role){
                 Role::create($role);
             }
     }
