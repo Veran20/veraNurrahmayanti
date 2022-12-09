@@ -114,68 +114,71 @@
             showConfirmButton: false,
             timer: 3000,
         })
-
+    
         @if(Session::has('message'))
             var type = "{{Session::get('alert-type')}}";
-            switch(type){
-                case 'info':
-                    Toast.fire({
+
+            switch (type) {
+                case 'info' {
+                    case 'info':
+                        Toast.fire({
                         type: 'info',
-                        tittle: "{{Session::get('message')}}"
-                    })
-                        break;
-                        case 'success':
-                        Toast.fire({
-                            type: 'success',
-                            tittle:  "{{Session::get('message')}}"
+                        title: "{{Session::get('message')}}"
                         })
-                        break;
-                        case 'warning':
+                    break;
+                    case 'success':
                         Toast.fire({
-                            type: 'warning',
-                            tittle:  "{{Session::get('message')}}"
+                        type: 'success',
+                        title: "{{Session::get('message')}}"
                         })
-                        break;
-                        case 'error':
+                    break;
+                    case 'warning':
                         Toast.fire({
+                        type: 'warning',
+                        title: "{{Session::get('message')}}"
+                        })
+                    break;
+                    case 'error':
+                        Toast.fire({
+                        type: 'info',
+                        title: "{{Session::get('message')}}"
+                        })
+                    break;
+                    case 'dialog_error':
+                        Swal.fire({
+                        type: 'error',
+                        title: "Ooops",
+                        text: "{{Session::get('message')}}",
+                        timer: 3000
+                        })
+                    break;
+                }
+                @endif
+
+                @if ($errors->any())
+                    @foreach ($errors->all() as $errors)
+                        Swal.fire({
                             type: 'error',
-                            tittle:  "{{Session::get('message')}}"
+                            title: "Ooops",
+                            text: "{{$error}}",
                         })
-                        break;
-                        case 'doialog_error':
-                        Toast.fire({
-                            type: 'error',
-                            tittle: "Ooops",
-                            text: "{{Session::get('message')}}",
-                            timer: 3000
-                        })
-                        break;
+                    @endforeach
+                @endif
             }
-        @endif
 
-        @if($errors->any())
-        @foreach($errors->all()as @enderror)
-        Swal.fire({
-            type: 'error',
-            tittle: "Ooops",
-            text: "{{$error)}}",
-        })
-        @endforeach
-        @endif
+            @if ($errors->any())
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Ooops",
+                            text: "Terjadi suatu kesalahan",
+                        })
+            @endif
+                    
+            $('#table-data').DataTable();
 
-        @if ($error->any())
-        Swal.fire({
-            icon: 'error',
-            tittle: "Ooops",
-            text: "Terjadi Suatu Kesalahan",
-        })
-        @endif
-        
-        $('#table-data').DataTable();
-
-        let baseurl="<?=url(/)?>";
-        let fullURL ="<?=url()->full()?>";
+            let baseurl = "<?=url('/')?>";
+            let fullURL = "<?=url()->full()?>";
     </script>
 </body>
-
+    
 </html>

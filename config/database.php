@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Str;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return [
 
