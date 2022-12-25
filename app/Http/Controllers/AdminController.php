@@ -7,8 +7,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
+
 use App\Models\Book;
+use App\Exports\BooksExport;
 use PDF;
+use Excel;
+use App\Imports\BooksImport;
 
 class AdminController extends Controller
 {
@@ -109,11 +113,14 @@ class AdminController extends Controller
 
     public function delete_book($id)
     {
-        $book =  Book::find($id);
-        $Storage::delete('public/cover_buku/'.$book->cover);
+        $book = Book::find($id);
+
+        Storage::delete('public/cover_buku/'.$book->cover);
+
         $book->delete();
+
         $success = true;
-        $message = "Data buku berhasil dihapus";
+        $message = "Data Buku Berhasil Dihapus";
 
         return response()->json([
             'success' => $success,
@@ -128,5 +135,21 @@ class AdminController extends Controller
         $pdf = PDF::loadview('print_books',['books'=> $books]);
 
         return $pdf->download('data_buku.pdf');
+    }
+
+    public function export(){
+        return Excel::download(new BooksExport, 'books.xlsx');
+    }
+
+    public function import(Request $req)
+    {
+        Excel::import(new BooksImport, $req->file('file'));
+
+        $notification = array(
+            'message' => 'Import data berhasil dilakukan',
+            'alert-type' => 'success'
+        );
+        
+        return redirect()->route('admin.books')->with($notification);
     }
 }

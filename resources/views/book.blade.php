@@ -9,15 +9,19 @@
 @section('content')
 <div class="container-fluid">
     <div class="card card-default">
-        <div class="card-header">{{__('Pengelolaan Buku')}}</div>
+        <div class="card-header">{{ __('Pengelolaan Buku') }}</div>
         <div class="card-body">
             <button class="btn btn-primary" data-toggle="modal" data-target="#tambahBukuModal"><i class="fa fa-plus"></i> Tambah Data</button>
-            <a href="{{ route('admin.print.books') }}" target="_blank" class="btn btn-secondary"><i class="fa fa-print"></i>Cetak PDF</a>           
+            <a href="{{ route('admin.print.books') }}" target="_blank" class="btn btn-success"><i class="fa fa-print"> Cetak PDF</i></a>
+            <div class="btn-group" role="group" aria-label="Basil Example">
+                <a href="{{ route('admin.book.export') }}" class="btn btn-info" target="_blank"> Export</a>
+                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#importDataModal"> Import</button>
+            </div>
             <hr/>
             <table id="table-data" class="table table-bordered">
                 <thead>
                     <tr class="text-center">
-                        <th>NO</th> 
+                        <th>NO</th>
                         <th>JUDUL</th>
                         <th>PENULIS</th>
                         <th>TAHUN</th>
@@ -36,18 +40,18 @@
                         <td>{{$book->tahun}}</td>
                         <td>{{$book->penerbit}}</td>
                         <td>
-                            @if ($book->cover !== null)
-                            <img src="{{asset('storage/cover_buku/'.$book->cover)}}" width="100px"/>
-                            @else
-                            [Gambar Tidak Tersedia]
-                    @endif
+                        @if($book->cover !== null)
+                            <img src="{{ asset('storage/cover_buku/'.$book->cover) }}" width="100px">
+                        @else
+                                [Gambar Tidak Tersedia]
+                        @endif
                 </td>
                 <td>
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <button type="button" id="btn-edit-buku" class="btn btn-success" data-toggle="modal" data-target="#editBukuModal" data-id="{{ $book->id }}">
                             Edit
                         </button>
-                        <button type="button" class="btn btn-danger" onclick="deleteConfirmation('{{$book->id}}', '{{$book->judul}}')">
+                        <button type="button" class="btn btn-danger" onclick="deleteConfirmation('{{$book->id}}', '{{$book->judul}}' )">
                             Hapus
                         </button>
                     </div>
@@ -59,6 +63,8 @@
         </div>
     </div>
 </div>
+
+{{-- TAMBAH BUKU MODAL --}}
 
 <div class="modal fade" id="tambahBukuModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -72,7 +78,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('admin.book.submit') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('admin.book.submit')}}" method="post" enctype="multipart/form-data">
                     @csrf
                         <div class="form-group">
                             <label for="judul">Judul Buku</label>
@@ -104,6 +110,8 @@
         </div>
     </div>
 </div>
+
+{{-- EDIT BUKU MODAL --}}
 
 <div class="modal fade" id="editBukuModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -159,17 +167,48 @@
         </div>
     </div>
 </div>
+
+{{-- IMPORT DATA FORM MODAL --}}
+
+<div class="modal fade" id="importDataModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    Import Data
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{ route('admin.book.import') }}" enctype="multipart/form-data">
+                @csrf
+                    <div class="form-group">
+                        <label for="cover">Upload File</label>
+                        <input type="file" class="form-control" name="file"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"> Batal</button>
+                        <button type="submit" class="btn btn-primary"> Import Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @stop
 
 @section('js')
+
+{{-- FUNCTION EDIT BUKU --}}
+
     <script>
         $(function(){
             $(document).on('click','#btn-edit-buku', function(){
-
                 let id = $(this).data('id');
-
                 $('#image-area').empty();
-
                 $.ajax({
                     type: "get",
                     url: "{{url('/admin/ajaxadmin/dataBuku')}}/"+id,
@@ -181,7 +220,6 @@
                         $('#edit-tahun').val(res.tahun);
                         $('#edit-id').val(res.id);
                         $('#edit-old-cover').val(res.cover);
-
                         if (res.cover !== null) {
                             $('#image-area').append("<img src='"+baseurl+"/storage/cover_buku/"+res.cover+"' width='200px'/>" );
                         } else {
@@ -191,11 +229,7 @@
                 });
             });
         });
-    </script>
-@stop
-
-@section('js')
-    <script>
+// FUNCTION DELETE BUKU
         function deleteConfirmation(id, judul) {
             swal.fire({
                 title: "Hapus?",
@@ -208,7 +242,6 @@
             }).then(function (e) {
                 if (e.value === true) {
                     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-
                     $.ajax({
                         type: 'POST',
                         url: "books/delete/" + id,
